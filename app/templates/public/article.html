@@ -1,0 +1,519 @@
+{% extends "base_public.html" %}
+
+{% block title %}{{ article.title }} — Goose Tecnologia{% endblock %}
+{% block meta_description %}{{ article.meta_description or article.summary or article.subtitle }}{% endblock %}
+{% block body_classes %}bg-[#0B1326] font-sans antialiased text-[#E2E8F0] min-h-screen flex flex-col{% endblock %}
+
+{% block content %}
+<!-- BARRA DE PROGRESSO DE LEITURA (FIXA NO TOPO) -->
+<div class="fixed top-0 left-0 w-full z-50 pointer-events-none" id="reading-progress-wrapper">
+  <div class="w-full bg-[#080D1A]/80 backdrop-blur-sm h-[3px] relative overflow-hidden">
+    <div class="h-full bg-gradient-to-r from-[#E12B4A] via-[#4A90E2] to-[#4A90E2] w-0 transition-all duration-75 ease-out" id="reading-progress-bar" style="width: 0%;"></div>
+  </div>
+  <div class="max-w-6xl mx-auto px-6 relative flex justify-end">
+    <div class="opacity-0 transition-opacity duration-300 inline-flex items-center gap-2 mt-2 px-2.5 py-1 rounded bg-[#080D1A]/95 border border-[#1C2742] text-[11px] font-mono text-[#8E9EB5] shadow-lg" id="reading-progress-badge">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#4A90E2] animate-pulse"></span>
+      <span class="text-[#8E9EB5]/80">Progresso:</span>
+      <span class="text-white font-medium" id="reading-progress-percent">0%</span>
+      <span class="text-[#1C2742]">•</span>
+      <span class="material-symbols-outlined text-[13px] text-[#4A90E2]">schedule</span>
+      <span class="text-[#E2E8F0]" id="reading-time-remaining" data-total-minutes="{{ article.reading_time_minutes }}">~{{ article.reading_time_minutes }} min rest.</span>
+    </div>
+  </div>
+</div>
+
+<!-- BARRA FLUTUANTE DO MODO ZEN -->
+<div class="fixed top-4 right-6 z-50 hidden transition-all duration-300 items-center gap-3 bg-[#080D1A]/95 backdrop-blur-md border border-[#1C2742] px-4 py-2 rounded-full shadow-2xl" id="zen-floating-bar">
+  <span class="w-2 h-2 rounded-full bg-[#4A90E2] animate-pulse"></span>
+  <span class="text-xs font-mono text-[#8E9EB5]">Modo Zen Ativo</span>
+  <span class="text-[#1C2742]">|</span>
+  <button class="text-xs font-mono text-white hover:text-[#E12B4A] flex items-center gap-1 transition-colors" onclick="toggleZenMode()">
+    <span class="material-symbols-outlined text-sm">close</span>
+    <span>Sair (ESC)</span>
+  </button>
+</div>
+
+<!-- HEADER MINIMALISTA -->
+<header class="sticky top-0 z-40 bg-[#0B1326]/90 backdrop-blur-md border-b border-[#1C2742]/70" id="main-header">
+  <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+    <!-- Logo Oficial Goose Tecnologia -->
+    <a class="flex items-center gap-3 transition-opacity hover:opacity-95" href="{{ url_for('public.index') }}">
+      <div class="bg-white/95 px-2.5 py-1 rounded flex items-center shadow-sm">
+        <img alt="Goose Tecnologia" class="h-7 w-auto object-contain" src="{{ url_for('static', filename='img/goose_logo_horizontal.png') }}" />
+      </div>
+      <span class="hidden sm:inline-block font-mono text-xs text-[#8E9EB5] tracking-widest pl-2 border-l border-[#1C2742]">BLOG Goose Tecnologia</span>
+    </a>
+
+    <!-- Navegação Limpa & Arejada -->
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#8E9EB5]">
+      <a class="text-white font-semibold transition-colors" href="{{ url_for('public.index') }}#artigos">Artigos</a>
+      <a class="hover:text-white transition-colors" href="{{ url_for('public.index') }}#artigos">Ferramentas</a>
+      <!--<a class="hover:text-[#4A90E2] transition-colors" href="#goocast-player">GOOCAST</a>-->
+      <!--<a class="hover:text-[#4A90E2] transition-colors font-mono text-xs" href="{{ url_for('cms.editor', article_id=article.id) }}">Editar no CMS</a>-->
+    </nav>
+
+    <!-- Ações Diretas & Ferramentas do Leitor -->
+    <div class="flex items-center gap-2.5 sm:gap-3">
+      <!-- Tempo de Leitura -->
+      <div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded border border-[#1C2742]/80 bg-[#101930]/70 text-[11px] font-mono text-[#8E9EB5]">
+        <span class="material-symbols-outlined text-xs text-[#4A90E2]">auto_stories</span>
+        <span class="text-[#8E9EB5]/70">Tempo:</span>
+        <span class="text-white font-medium">{{ article.reading_time_minutes }} min</span>
+      </div>
+
+      <!-- Toggle Tema Claro / Tema Escuro -->
+      <button aria-label="Alternar Tema Claro/Escuro" class="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#1C2742] text-[#8E9EB5] hover:text-white hover:border-[#4A90E2] hover:bg-[#101930] transition-all" id="theme-toggle-btn" onclick="toggleThemeMode()" title="Alternar Modo Claro / Escuro">
+        <span class="material-symbols-outlined text-[17px] text-[#4A90E2]" id="theme-icon">light_mode</span>
+      </button>
+
+      <!-- Botão Imprimir / Exportar PDF -->
+      <button aria-label="Imprimir Artigo ou Salvar em PDF" class="inline-flex items-center gap-1.5 text-xs font-mono font-medium tracking-wide uppercase px-3 py-1.5 rounded-full border border-[#1C2742] text-[#8E9EB5] hover:text-white hover:border-[#4A90E2] hover:bg-[#101930] transition-all" id="print-pdf-btn" onclick="window.print()" title="Imprimir ou Salvar como PDF formatado">
+        <span class="material-symbols-outlined text-[15px] text-[#4A90E2]">print</span>
+        <span class="hidden sm:inline">PDF</span>
+      </button>
+
+      <!-- Modo Zen -->
+      <button aria-label="Ativar Modo Zen" class="inline-flex items-center gap-1.5 text-xs font-mono font-medium tracking-wide uppercase px-3 py-1.5 rounded-full border border-[#1C2742] text-[#8E9EB5] hover:text-white hover:border-[#4A90E2] hover:bg-[#101930] transition-all" id="zen-mode-toggle-btn" onclick="toggleZenMode()" title="Modo de Leitura Zen (sem distrações)">
+        <span class="material-symbols-outlined text-[15px] text-[#4A90E2]">center_focus_strong</span>
+        <span class="hidden sm:inline">Modo Zen</span>
+      </button>
+
+      <!-- Copiloto IA -->
+      <a class="hidden sm:inline-flex items-center gap-2 text-xs font-mono font-medium tracking-wide uppercase px-3.5 py-1.5 rounded-full border border-[#1C2742] text-[#E2E8F0] hover:border-[#E12B4A] hover:text-white hover:bg-[#101930] transition-all" href="{{ url_for('public.index') }}">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E12B4A] animate-pulse"></span>
+        <span>Hub Blog</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ASSINATURA BICOLOR SUTIL (VERMELHO / AZUL) -->
+<div class="w-full flex h-[2px]" id="bicolor-top-line">
+  <div class="w-1/2 bg-[#E12B4A]"></div>
+  <div class="w-1/2 bg-[#4A90E2]"></div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL DO ARTIGO -->
+<main class="max-w-6xl mx-auto px-6 py-10 md:py-16 flex-1 w-full">
+  <div class="flex flex-col w-full" id="article-content-wrapper">
+    <!-- HEADER EDITORIAL MINIMALISTA -->
+    <div class="flex flex-col gap-6 mb-10 pb-8 border-b border-[#1C2742]/60">
+      <!-- Tag Superior & Metadados -->
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded bg-[#E12B4A]/15 text-[#E12B4A] border border-[#E12B4A]/30 font-semibold uppercase tracking-wider text-[11px]">
+            {{ article.category.name if article.category else 'EDITORIAL EM DESTAQUE' }}
+          </span>
+          <span class="text-[#1C2742]">•</span>
+          <span class="text-[#8E9EB5]">Por {{ article.author_display }}</span>
+          <span class="text-[#1C2742]">•</span>
+          <span class="text-[#4A90E2] font-medium">{{ article.reading_time_minutes }} min de leitura técnica</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          {% for tag in article.tags %}
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#101930] text-[#8E9EB5] border border-[#1C2742] text-[11px]">
+            {% if loop.first %}<span class="w-1.5 h-1.5 rounded-full bg-[#4A90E2]"></span>{% endif %}
+            #{{ tag.name }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- TÍTULO EDITORIAL -->
+      <h1 class="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl text-white tracking-tight leading-[1.15]">
+        {{ article.title }}
+      </h1>
+
+      <!-- SUBTÍTULO FLUIDO COM EXCELENTE RESPIRO -->
+      {% if article.subtitle or article.summary %}
+      <p class="font-sans text-base sm:text-lg text-[#8E9EB5] font-light leading-relaxed max-w-4xl">
+        {{ article.subtitle or article.summary }}
+      </p>
+      {% endif %}
+
+      <!-- PLAYER COMPACTO GOOCAST INTEGRADO -->
+      <div class="mt-2 p-4 rounded-xl bg-[#101930] border border-[#1C2742] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm" id="goocast-player">
+        <div class="flex items-center gap-3">
+          <button aria-label="Reproduzir Áudio" class="w-10 h-10 rounded-full bg-[#E12B4A] hover:bg-[#c92440] text-white flex items-center justify-center shrink-0 transition-transform active:scale-95 shadow-md" id="podcast-play-btn" onclick="togglePlayPodcast()">
+            <span class="material-symbols-outlined text-xl" id="podcast-play-icon">play_arrow</span>
+          </button>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-[#E12B4A] font-semibold">{{ article.goocast_episode_label or 'GOOCAST ÁUDIO' }}</span>
+              <span class="text-[#8E9EB5]/60">•</span>
+              <span class="text-xs font-mono text-[#8E9EB5]" id="audio-current-time" data-duration="{{ article.goocast_duration or ('%02d:00' | format(article.reading_time_minutes or 6)) }}">00:00 / {{ article.goocast_duration or ('%02d:00' | format(article.reading_time_minutes or 6)) }}</span>
+            </div>
+            <span class="text-sm font-medium text-white truncate max-w-sm sm:max-w-md" id="audio-track-title">{{ article.goocast_title or article.title }}</span>
+          </div>
+        </div>
+
+        <!-- Barra de Onda Sonora Interativa Minimalista -->
+        <div class="flex items-center gap-1.5 flex-1 max-w-xs cursor-pointer py-1" id="goocast-waveform" onclick="scrubAudio(event)">
+          <div class="h-2 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-4 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-6 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-3 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-7 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-5 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-8 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-4 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-6 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-3 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-5 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-2 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-6 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-4 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-7 w-1 bg-[#1C2742] rounded-full"></div>
+          <div class="h-3 w-1 bg-[#1C2742] rounded-full"></div>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-mono text-[#8E9EB5]">
+          <button class="hover:text-white px-2 py-1 rounded bg-[#0B1326] border border-[#1C2742]/80 transition-colors" onclick="changeAudioSpeed(this)" id="audio-speed-btn" title="Alterar velocidade da narração">
+            1.0x
+          </button>
+          <button class="hover:text-white px-2 py-1 rounded bg-[#0B1326] border border-[#1C2742]/80 transition-colors" onclick="copyArticleLink(this)" title="Copiar Link Permanente">
+            <span class="material-symbols-outlined text-sm align-middle">link</span> Copiar Link
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID PRINCIPAL: LATERAL DISCRETA + ARTIGO CENTRALIZADO -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <!-- LATERAL ESQUERDA: ÍNDICE MINIMALISTA DISCRETO -->
+      <aside class="lg:col-span-3 flex flex-col gap-6 lg:sticky lg:top-24" id="article-sidebar">
+        <div class="rounded-xl border border-[#1C2742] bg-[#080D1A]/60 p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between pb-2 border-b border-[#1C2742]/60 text-xs font-mono">
+            <span class="text-[#8E9EB5] uppercase tracking-wider font-semibold">Sumário Técnico</span>
+            <span class="text-[#4A90E2]" id="toc-reading-indicator">1/{{ (toc_items|length) or 1 }}</span>
+          </div>
+          <nav class="flex flex-col gap-1 text-xs font-sans">
+            {% for item in toc_items %}
+            <a class="toc-link p-1.5 rounded {% if loop.first %}text-white bg-[#101930] font-medium{% else %}text-[#8E9EB5] hover:text-white hover:bg-[#101930]{% endif %} transition-all" href="#{{ item.id }}">
+              {{ item.title }}
+            </a>
+            {% endfor %}
+          </nav>
+        </div>
+      </aside>
+
+      <!-- COLUNA PRINCIPAL DO TEXTO TÉCNICO -->
+      <article class="lg:col-span-9 flex flex-col gap-6 font-sans text-[15px] sm:text-base text-[#8E9EB5] leading-relaxed" id="article-main-body">
+        <!-- Corpo Markdown Renderizado -->
+        <div class="flex flex-col gap-4" id="article-prose-body">
+          {{ rendered_html | safe }}
+        </div>
+
+
+        <!-- ASSINATURA & BIO DOS AUTORES -->
+        <div class="mt-8 pt-8 border-t border-[#1C2742] flex flex-col sm:flex-row items-center justify-between gap-6 p-6 rounded-xl bg-[#080D1A]/70 border border-[#1C2742]">
+          <div class="flex items-center gap-4">
+            {% if article.author and article.author_key != 'duo' %}
+            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#0B1326] shadow shrink-0">
+              <img class="w-full h-full object-cover" alt="{{ article.author.display_name }}" src="{{ article.author.avatar_url or 'https://lh3.googleusercontent.com/aida-public/AB6AXuCv2wN6Zl7YGCG44IolCNUScJ9kzQwH4ou8YYmvT8DbT5KBbGi4LOXzsVjFMcQlDhliLO5SJiH9HqmzRmaYWeO1N6vZIdkqSfDkOCKJ5e20cYUraU22Ysk-jfB2adM45hzWGs6bKago7yoNPH5QLO2knCSq0J932Ak_DeOpKkt6eEzSX62lbP83ezejW3QorHKjLQJhiksTfZ6OgmY4h4aixpFvsx3RUyFSJFR4hkk' }}" />
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-heading font-bold text-white text-sm">{{ article.author.display_name }}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#4A90E2]/20 text-[#4A90E2] uppercase font-semibold">{{ article.author.role_title }}</span>
+              </div>
+              <p class="text-xs text-[#8E9EB5] max-w-md mt-0.5">
+                {{ article.author.bio or 'Especialista técnico e redator de engenharia Telecom da Goose Tecnologia.' }}
+              </p>
+            </div>
+            {% else %}
+            <div class="flex -space-x-3 shrink-0">
+              <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#0B1326] shadow">
+                <img class="w-full h-full object-cover" alt="Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv2wN6Zl7YGCG44IolCNUScJ9kzQwH4ou8YYmvT8DbT5KBbGi4LOXzsVjFMcQlDhliLO5SJiH9HqmzRmaYWeO1N6vZIdkqSfDkOCKJ5e20cYUraU22Ysk-jfB2adM45hzWGs6bKago7yoNPH5QLO2knCSq0J932Ak_DeOpKkt6eEzSX62lbP83ezejW3QorHKjLQJhiksTfZ6OgmY4h4aixpFvsx3RUyFSJFR4hkk" />
+              </div>
+              <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#0B1326] shadow">
+                <img class="w-full h-full object-cover" alt="Wandeson" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4DNJwAxi9EJ6hISdJbD5hiZH7dNR6ZHV1e7lXiDuLfiS-IWIrvYi5ZXEHPRjWtcm5ykWuUsp-Fn7k0XTUN8ICnYe1KBfRywiLRR-V7VzOwPBdbyk29HAlmgiAbK9t1x3Hc-LDvn-8iTWwl1_jl5Fo4xdA-R0CVyUp2WjmI1TGBB0iKWu7N3ewQyPm7dW4DF-rvs83tclP362-qxkT56zWSUA2_xi7V0DpINMwalY" />
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-heading font-bold text-white text-sm">{{ article.author_display or 'Francisco & Wandeson' }}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#4A90E2]/20 text-[#4A90E2] uppercase font-semibold">{{ article.author_role_badge or 'Goose Founders' }}</span>
+              </div>
+              <p class="text-xs text-[#8E9EB5] max-w-md mt-0.5">
+                Especialistas em infraestrutura autônoma de telecomunicações, dimensionamento FTTH e bordas BGP para provedores em todo o Brasil.
+              </p>
+            </div>
+            {% endif %}
+          </div>
+          <a class="shrink-0 px-4 py-2 rounded-lg bg-[#101930] hover:bg-[#1C2742] text-xs font-mono text-white border border-[#1C2742] transition-colors flex items-center gap-1.5" href="#comentarios">
+            <span class="material-symbols-outlined text-sm text-[#E12B4A]">chat</span>
+            Comentar no Artigo
+          </a>
+        </div>
+
+        <!-- ÁREA DE COMENTÁRIOS E DISCUSSÃO TÉCNICA DA COMUNIDADE ISP -->
+        <section class="mt-6 pt-8 border-t border-[#1C2742] flex flex-col gap-6 scroll-mt-24" id="comentarios" data-article-slug="{{ article.slug }}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[#E12B4A] text-xl">forum</span>
+              <h3 class="font-heading font-bold text-lg sm:text-xl text-white tracking-tight">
+                Discussão Técnica &amp; Comentários
+              </h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#101930] border border-[#1C2742] font-mono text-xs text-[#4A90E2] font-semibold" id="comments-total-badge">
+                {{ total_comments_count or 0 }}
+              </span>
+            </div>
+            <span class="text-xs font-mono text-[#8E9EB5]">
+              Compartilhe a realidade da sua operação FTTH / NOC
+            </span>
+          </div>
+
+          <!-- Formulário de Novo Comentário -->
+          <form class="p-5 sm:p-6 rounded-xl bg-[#080D1A]/90 border border-[#1C2742] flex flex-col gap-4 shadow-sm" id="article-comment-form" onsubmit="submitArticleComment(event)">
+            <input type="hidden" id="comment-parent-id" name="parent_id" value="" />
+
+            <!-- Indicador de Resposta (quando o usuário clica em Responder em um comentário) -->
+            <div class="hidden items-center justify-between px-3.5 py-2 rounded-lg bg-[#101930] border border-[#4A90E2]/40 text-xs font-mono text-[#E2E8F0]" id="comment-reply-banner">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm text-[#4A90E2]">reply</span>
+                <span>Respondendo a <strong class="text-white" id="comment-reply-target-name"></strong></span>
+              </div>
+              <button type="button" onclick="cancelCommentReply()" class="text-[#8E9EB5] hover:text-[#E12B4A] transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">close</span> Cancelar
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-mono uppercase tracking-wider text-[#8E9EB5]" for="comment-author-name">
+                  Seu Nome <span class="text-[#E12B4A]">*</span>
+                </label>
+                <input
+                  id="comment-author-name"
+                  name="author_name"
+                  type="text"
+                  required
+                  maxlength="120"
+                  value="{{ current_user.display_name if current_user.is_authenticated else '' }}"
+                  placeholder="Ex: Rodrigo Almeida"
+                  class="px-3.5 py-2.5 rounded-lg bg-[#101930] border border-[#1C2742] focus:border-[#4A90E2] focus:outline-none text-xs sm:text-sm text-white placeholder-[#8E9EB5]/50 font-sans transition-colors"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-mono uppercase tracking-wider text-[#8E9EB5]" for="comment-author-isp">
+                  Provedor / Cargo ou ASN <span class="text-[#8E9EB5]/60">(Opcional)</span>
+                </label>
+                <input
+                  id="comment-author-isp"
+                  name="author_role_isp"
+                  type="text"
+                  maxlength="120"
+                  value="{{ current_user.role_title if current_user.is_authenticated else '' }}"
+                  placeholder="Ex: Gerente de NOC • AS263481"
+                  class="px-3.5 py-2.5 rounded-lg bg-[#101930] border border-[#1C2742] focus:border-[#4A90E2] focus:outline-none text-xs sm:text-sm text-white placeholder-[#8E9EB5]/50 font-sans transition-colors"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] font-mono uppercase tracking-wider text-[#8E9EB5]" for="comment-content">
+                Seu Comentário, Relato Operacional ou Dúvida <span class="text-[#E12B4A]">*</span>
+              </label>
+              <textarea
+                id="comment-content"
+                name="content"
+                rows="3"
+                required
+                maxlength="3000"
+                placeholder="Deixe sua opinião técnica, dúvida ou conte como seu provedor está lidando com esse cenário..."
+                class="px-3.5 py-2.5 rounded-lg bg-[#101930] border border-[#1C2742] focus:border-[#4A90E2] focus:outline-none text-xs sm:text-sm text-white placeholder-[#8E9EB5]/50 font-sans leading-relaxed transition-colors resize-y"
+              ></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <span class="text-xs font-mono text-[#8E9EB5]" id="comment-form-feedback">
+                {% if current_user.is_authenticated %}
+                <span class="text-[#4A90E2]">● Autenticado como Equipe Editorial Goose</span>
+                {% else %}
+                Comentários abertos para engenheiros, gestores e equipes de ISPs.
+                {% endif %}
+              </span>
+              <button
+                type="submit"
+                id="comment-submit-btn"
+                class="px-5 py-2.5 rounded-lg bg-[#E12B4A] hover:bg-[#c82340] text-white font-heading font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-sm">send</span>
+                <span>Publicar Comentário</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Lista de Comentários -->
+          <div class="flex flex-col gap-4" id="comments-list-container">
+            {% if comments %}
+              {% for c in comments %}
+              <div class="p-4 sm:p-5 rounded-xl bg-[#080D1A]/75 border border-[#1C2742] flex flex-col gap-3" id="comment-card-{{ c.id }}">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-[#101930] border border-[#1C2742] flex items-center justify-center font-mono text-xs font-bold {% if c.is_author_badge %}text-[#E12B4A] border-[#E12B4A]/50{% else %}text-[#4A90E2]{% endif %} shrink-0">
+                      {{ c.initials }}
+                    </div>
+                    <div class="flex flex-col">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-heading font-semibold text-sm text-white">{{ c.author_name }}</span>
+                        {% if c.is_author_badge %}
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E12B4A]/20 text-[#E12B4A] border border-[#E12B4A]/30 uppercase font-semibold">Equipe Goose</span>
+                        {% endif %}
+                        {% if c.author_role_isp %}
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#101930] text-[#4A90E2] border border-[#1C2742]">{{ c.author_role_isp }}</span>
+                        {% endif %}
+                      </div>
+                      <span class="text-[11px] font-mono text-[#8E9EB5]/75">{{ c.created_at.strftime('%d/%m/%Y às %H:%M') if c.created_at else '' }}</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onclick="prepareCommentReply({{ c.id }}, {{ c.author_name | tojson }})"
+                      class="px-2.5 py-1 rounded bg-[#101930] hover:bg-[#1C2742] text-[11px] font-mono text-[#8E9EB5] hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-xs">reply</span> Responder
+                    </button>
+                    {% if current_user.is_authenticated %}
+                    <button
+                      type="button"
+                      onclick="deleteArticleComment({{ c.id }})"
+                      title="Excluir comentário (Admin CMS)"
+                      class="p-1 rounded bg-[#101930] hover:bg-[#E12B4A]/20 text-[#8E9EB5] hover:text-[#E12B4A] transition-colors flex items-center cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-xs">delete</span>
+                    </button>
+                    {% endif %}
+                  </div>
+                </div>
+                <p class="text-xs sm:text-sm text-[#E2E8F0] leading-relaxed whitespace-pre-line pl-12">{{ c.content }}</p>
+
+                <!-- Respostas aninhadas -->
+                <div class="flex flex-col gap-3 pl-6 sm:pl-12 mt-1 {% if not c.replies %}hidden{% endif %}" id="comment-replies-{{ c.id }}">
+                  {% for r in c.replies %}
+                  <div class="p-3.5 rounded-lg bg-[#101930]/75 border-l-2 border-[#4A90E2] border-y border-r border-[#1C2742] flex flex-col gap-2" id="comment-card-{{ r.id }}">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-[#080D1A] border border-[#1C2742] flex items-center justify-center font-mono text-[10px] font-bold {% if r.is_author_badge %}text-[#E12B4A]{% else %}text-[#4A90E2]{% endif %} shrink-0">
+                          {{ r.initials }}
+                        </div>
+                        <div class="flex flex-col">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-heading font-semibold text-xs text-white">{{ r.author_name }}</span>
+                            {% if r.is_author_badge %}
+                            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#E12B4A]/20 text-[#E12B4A] uppercase font-semibold">Equipe Goose</span>
+                            {% endif %}
+                            {% if r.author_role_isp %}
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#080D1A] text-[#4A90E2]">{{ r.author_role_isp }}</span>
+                            {% endif %}
+                          </div>
+                          <span class="text-[10px] font-mono text-[#8E9EB5]/75">{{ r.created_at.strftime('%d/%m/%Y às %H:%M') if r.created_at else '' }}</span>
+                        </div>
+                      </div>
+                      {% if current_user.is_authenticated %}
+                      <button
+                        type="button"
+                        onclick="deleteArticleComment({{ r.id }})"
+                        title="Excluir resposta (Admin CMS)"
+                        class="p-1 rounded bg-[#080D1A] hover:bg-[#E12B4A]/20 text-[#8E9EB5] hover:text-[#E12B4A] transition-colors flex items-center cursor-pointer"
+                      >
+                        <span class="material-symbols-outlined text-xs">delete</span>
+                      </button>
+                      {% endif %}
+                    </div>
+                    <p class="text-xs sm:text-sm text-[#E2E8F0] leading-relaxed whitespace-pre-line pl-9">{{ r.content }}</p>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="p-6 rounded-xl bg-[#080D1A]/50 border border-dashed border-[#1C2742] text-center flex flex-col items-center gap-2" id="comments-empty-state">
+                <span class="material-symbols-outlined text-2xl text-[#4A90E2]/70">chat_bubble_outline</span>
+                <p class="text-xs sm:text-sm text-[#8E9EB5]">
+                  Nenhum comentário ainda. Seja o primeiro a compartilhar a visão do seu provedor!
+                </p>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+      </article>
+    </div>
+
+    <!-- SEÇÃO MINIMALISTA: PRÓXIMOS ENSAIOS -->
+    <div class="mt-16 pt-12 border-t border-[#1C2742]/60 flex flex-col gap-6" id="article-extra-sections">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#E12B4A]"></span>
+          <span class="text-xs font-mono uppercase tracking-wider text-white font-semibold">PRÓXIMOS ENSAIOS TÉCNICOS</span>
+        </div>
+        <a class="text-xs font-mono text-[#4A90E2] hover:underline flex items-center gap-1" href="{{ url_for('public.index') }}#artigos">
+          Ver todos os artigos <span class="material-symbols-outlined text-xs">arrow_forward</span>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for rel in related_articles %}
+        <a class="group p-6 rounded-xl bg-[#080D1A] border border-[#1C2742] hover:border-[#4A90E2] transition-all flex flex-col gap-3" href="{{ url_for('public.article_detail', slug=rel.slug) }}">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="{% if loop.first %}text-[#E12B4A]{% else %}text-[#4A90E2]{% endif %} font-semibold uppercase tracking-wider">{{ rel.category.name if rel.category else 'ENGENHARIA TELECOM' }}</span>
+            <span class="text-[#8E9EB5]">{{ rel.reading_time_minutes }} min</span>
+          </div>
+          <h3 class="font-heading font-bold text-base sm:text-lg text-white group-hover:text-[#4A90E2] transition-colors leading-snug">
+            {{ rel.title }}
+          </h3>
+          <p class="text-xs sm:text-sm text-[#8E9EB5] line-clamp-2 leading-relaxed">
+            {{ rel.summary or rel.subtitle }}
+          </p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- BANNER EXCLUSIVO DE IMPRESSÃO (PDF/PRINT) -->
+<div class="hidden print:block pt-8 mt-12 border-t-2 border-gray-300 text-xs text-gray-600 font-mono text-center" id="print-footer-banner">
+  <p class="font-bold text-gray-800">Documento Técnico emitido por Goose Tecnologia — Engenharia de Telecomunicações</p>
+  <p class="text-gray-500 mt-1">Disponível online em: https://goose.tec.br/blog/{{ article.slug }} · © 2026 Goose Tecnologia</p>
+</div>
+
+<!-- RODAPÉ MINIMALISTA -->
+<footer class="mt-20 border-t border-[#1C2742]/70 bg-[#080D1A]" id="main-footer">
+  <div class="w-full flex h-[2px]">
+    <div class="w-1/2 bg-[#E12B4A]"></div>
+    <div class="w-1/2 bg-[#4A90E2]"></div>
+  </div>
+  <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-10">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <div class="bg-white/95 px-2 py-1 rounded flex items-center shadow-sm">
+          <img alt="Goose Tecnologia" class="h-6 w-auto object-contain" src="{{ url_for('static', filename='img/goose_logo_horizontal.png') }}" />
+        </div>
+        <span class="text-xs font-mono text-[#8E9EB5]">Por Francisco &amp; Wandeson</span>
+      </div>
+      <div class="flex flex-wrap gap-6 text-xs font-mono text-[#8E9EB5]">
+        <a class="hover:text-white transition-colors" href="{{ url_for('public.index') }}#artigos">Artigos</a>
+        <a class="hover:text-[#4A90E2] transition-colors" href="#goocast-player">GOOCAST</a>
+        <a class="hover:text-white transition-colors" href="{{ url_for('cms.dashboard') }}">Goose CMS</a>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#8E9EB5]/70 pt-6 border-t border-[#1C2742]/40">
+      <p>© 2026 Goose Tecnologia. Todos os direitos reservados.</p>
+      <p>Telecom B2B Hub · Engenharia &amp; Operação de ISPs</p>
+    </div>
+  </div>
+</footer>
+
+<!-- BOTÃO FLUTUANTE VOLTAR AO TOPO -->
+<button aria-label="Voltar ao topo" class="fixed bottom-8 right-8 z-50 w-11 h-11 rounded-full bg-[#101930]/90 backdrop-blur border border-[#1C2742] hover:border-[#E12B4A] text-[#8E9EB5] hover:text-white shadow-xl flex items-center justify-center transition-all duration-300 group cursor-pointer opacity-0 pointer-events-none hover:scale-105 active:scale-95" id="back-to-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+  <span class="material-symbols-outlined text-xl transition-transform duration-200 group-hover:-translate-y-0.5">arrow_upward</span>
+  <span class="absolute right-full mr-3 px-2 py-1 rounded bg-[#080D1A]/95 border border-[#1C2742] text-[11px] font-mono text-[#E2E8F0] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md">Voltar ao topo</span>
+</button>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/article.js') }}"></script>
+{% endblock %}
+

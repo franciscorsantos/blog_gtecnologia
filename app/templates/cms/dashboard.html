@@ -1,0 +1,708 @@
+{% extends "base_cms.html" %}
+
+{% block title %}GOOSE TECNOLOGIA — CMS & Gestão Editorial do Blog{% endblock %}
+{% block breadcrumb %}Artigos &amp; Ensaios{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Split Signature Micro Indicator Bar -->
+  <div class="w-full h-1 flex rounded-full overflow-hidden shadow-sm mb-space-lg">
+    <div class="w-1/2 h-full bg-primary-container"></div>
+    <div class="w-1/2 h-full bg-secondary-container"></div>
+  </div>
+
+  <!-- Header & Telemetry Hero Summary -->
+  <section class="flex flex-col xl:flex-row items-start xl:items-end justify-between gap-space-lg pb-space-lg">
+    <div class="flex flex-col max-w-3xl">
+      <div class="flex items-center gap-space-xs text-tertiary font-telemetry-code text-telemetry-code uppercase tracking-wider mb-space-xs">
+        <span class="inline-block w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+        NOC Editorial • Uptime CDN 99.98% • v2.46
+      </div>
+      <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+        Gestão Editorial de Ensaios &amp; Artigos
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-1 leading-relaxed">
+        Controle de publicação, telemetria de leitura e metadados técnicos de Telecom por
+        <span class="text-on-surface font-medium">Francisco (CEO/Engenharia)</span> e
+        <span class="text-on-surface font-medium">Wandeson (CX/Operações)</span>.
+      </p>
+    </div>
+
+    <!-- Global CTA Cluster -->
+    <div class="flex flex-wrap items-center gap-space-sm w-full xl:w-auto">
+      <button class="flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-tertiary font-telemetry-code text-telemetry-code transition-all shadow-sm" id="sync-cdn-btn">
+        <span class="material-symbols-outlined text-[18px]">cached</span>
+        <span>Sincronizar Cache CDN</span>
+      </button>
+      <button class="flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-telemetry-code text-telemetry-code transition-all shadow-sm" id="export-json-btn">
+        <span class="material-symbols-outlined text-[18px]">download_for_offline</span>
+        <span>Exportar Markdown/JSON</span>
+      </button>
+      <a href="{{ url_for('cms.editor', new=1) }}" class="flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-body-md font-bold shadow-md shadow-primary-container/30 transition-all hover:scale-[1.01]">
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        <span>Novo Ensaio (+)</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Metric Badges Section (4 KPI Cards) -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl">
+    <!-- Card 1 -->
+    <div class="relative overflow-hidden p-space-lg bg-surface-container rounded-xl shadow-md transition-all hover:bg-surface-container-high">
+      <div class="flex items-center justify-between">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Artigos Publicados</span>
+        <span class="material-symbols-outlined text-tertiary text-[20px]">auto_stories</span>
+      </div>
+      <div class="flex items-baseline gap-space-xs mt-space-md">
+        <span class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ published_count }}</span>
+        <span class="font-telemetry-code text-telemetry-code text-tertiary">ativos</span>
+        <span class="font-body-sm text-body-sm text-on-surface-variant ml-auto bg-surface-container-lowest px-2 py-0.5 rounded">+{{ draft_count }} rascunho{% if draft_count != 1 %}s{% endif %}</span>
+      </div>
+      <div class="w-full bg-surface-container-lowest h-1.5 rounded-full mt-3 overflow-hidden">
+        <div class="bg-tertiary h-full rounded-full w-[83%]"></div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="relative overflow-hidden p-space-lg bg-surface-container rounded-xl shadow-md transition-all hover:bg-surface-container-high">
+      <div class="flex items-center justify-between">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Leituras no Mês</span>
+        <span class="material-symbols-outlined text-secondary text-[20px]">insights</span>
+      </div>
+      <div class="flex items-baseline gap-space-xs mt-space-md">
+        <span class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ formatted_total_views }}</span>
+        <span class="font-telemetry-code text-telemetry-code text-secondary">reqs</span>
+        <div class="flex items-center text-tertiary font-telemetry-code text-label-badge ml-auto">
+          <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+          <span>+14.2%</span>
+        </div>
+      </div>
+      <div class="w-full bg-surface-container-lowest h-1.5 rounded-full mt-3 overflow-hidden">
+        <div class="bg-secondary-container h-full rounded-full w-[72%]"></div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="relative overflow-hidden p-space-lg bg-surface-container rounded-xl shadow-md transition-all hover:bg-surface-container-high">
+      <div class="flex items-center justify-between">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Tempo Médio / Leitor</span>
+        <span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+      </div>
+      <div class="flex items-baseline gap-space-xs mt-space-md">
+        <span class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ avg_reading }}</span>
+        <span class="font-telemetry-code text-telemetry-code text-primary">min</span>
+        <span class="font-label-badge text-label-badge text-tertiary ml-auto bg-surface-container-lowest px-2 py-0.5 rounded">Deep Read</span>
+      </div>
+      <div class="w-full bg-surface-container-lowest h-1.5 rounded-full mt-3 overflow-hidden">
+        <div class="bg-primary-container h-full rounded-full w-[65%]"></div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="relative overflow-hidden p-space-lg bg-surface-container rounded-xl shadow-md transition-all hover:bg-surface-container-high">
+      <div class="flex items-center justify-between">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Taxa de Retenção</span>
+        <span class="material-symbols-outlined text-secondary-fixed text-[20px]">network_ping</span>
+      </div>
+      <div class="flex items-baseline gap-space-xs mt-space-md">
+        <span class="font-headline-lg text-headline-lg font-bold text-on-surface">82%</span>
+        <span class="font-telemetry-code text-telemetry-code text-secondary-fixed">scroll</span>
+        <span class="font-label-badge text-label-badge text-on-surface-variant ml-auto bg-surface-container-lowest px-2 py-0.5 rounded">{{ leads|length }} leads NOC</span>
+      </div>
+      <div class="w-full bg-surface-container-lowest h-1.5 rounded-full mt-3 overflow-hidden">
+        <div class="bg-tertiary-container h-full rounded-full w-[82%]"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAINEL PRINCIPAL: ARTIGOS & INSPETOR DE METADADOS -->
+  <div id="cms-pane-articles" class="cms-view-pane grid grid-cols-1 2xl:grid-cols-12 gap-space-lg items-start">
+    <!-- Left Column: Search, Filters & Comprehensive Articles Table (8 cols in 2xl) -->
+    <div class="2xl:col-span-8 flex flex-col gap-space-md">
+      <!-- Content Toolbar -->
+      <div class="p-space-md bg-surface-container rounded-xl shadow-md flex flex-col gap-space-md">
+        <!-- Top Row: Tab Navigation -->
+        <div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm bg-surface-container-low/60 p-2 rounded-lg">
+          <div class="flex flex-wrap items-center gap-1">
+            <button onclick="filterByStatusTab('all', this)" class="cms-status-tab px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-body-sm font-semibold shadow-sm">
+              Todos ({{ total_count }})
+            </button>
+            <button onclick="filterByStatusTab('published', this)" class="cms-status-tab px-space-md py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all">
+              Publicados ({{ published_count }})
+            </button>
+            <button onclick="filterByStatusTab('draft', this)" class="cms-status-tab px-space-md py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all">
+              Rascunhos ({{ draft_count }})
+            </button>
+            <button onclick="filterByStatusTab('review', this)" class="cms-status-tab px-space-md py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all">
+              Em Revisão ({{ review_count }})
+            </button>
+            <button onclick="filterByStatusTab('archived', this)" class="cms-status-tab px-space-md py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all">
+              Arquivados ({{ archived_count }})
+            </button>
+          </div>
+          <div class="flex items-center gap-space-xs text-on-surface-variant font-telemetry-code text-label-badge bg-surface-container-lowest px-space-sm py-1 rounded">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+            FEED RSS / ATOM SYNC
+          </div>
+        </div>
+
+        <!-- Bottom Row: Search & Multi-Filters -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm">
+          <!-- Live Search Bar -->
+          <div class="md:col-span-6 relative">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[18px]">search</span>
+            <input class="w-full pl-10 pr-space-md py-2 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/60 font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-tertiary shadow-inner" id="editorial-search" placeholder="Buscar por título, slug, tag (BGP, TR-069, Wi-Fi) ou autor..." type="text" />
+          </div>
+          <!-- Author Filter Select -->
+          <div class="md:col-span-3 relative">
+            <select onchange="filterByAuthor(this.value)" class="w-full px-space-md py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-tertiary appearance-none cursor-pointer">
+              <option value="all">Autor: Todos</option>
+              <option value="duo">Francisco &amp; Wandeson (Co-autoria)</option>
+              {% for u in users %}
+              <option value="{{ u.username }}">{{ u.display_name }} ({{ u.role_title }})</option>
+              {% endfor %}
+            </select>
+            <span class="material-symbols-outlined absolute right-2.5 top-2.5 pointer-events-none text-on-surface-variant text-[18px]">expand_more</span>
+          </div>
+          <!-- Quick Action -->
+          <div class="md:col-span-3">
+            <a href="{{ url_for('cms.editor', new=1) }}" class="w-full flex items-center justify-between px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all shadow-sm">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="material-symbols-outlined text-[16px] text-tertiary">add_box</span>
+                Criar Rascunho
+              </span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Articles Data Grid (Bespoke NOC Design) -->
+      <div class="flex flex-col gap-space-sm" id="articles-container">
+        {% for art in articles %}
+        {% set tags_joined = art.tags | map(attribute='name') | map('regex_replace', '^', '#') | join(', ') if false else '' %}
+        <article class="cms-article-row p-space-lg {% if art.status == 'draft' %}bg-surface-container/70{% else %}bg-surface-container{% endif %} rounded-xl shadow-md transition-all hover:bg-surface-container-high relative overflow-hidden group cursor-pointer {% if active_article and art.id == active_article.id %}ring-1 ring-tertiary/50{% endif %}"
+                 data-id="{{ art.id }}"
+                 data-status="{{ art.status }}"
+                 data-author="{{ art.author_key }}"
+                 data-title="{{ art.title }}"
+                 data-slug="{{ art.slug }}"
+                 data-description="{{ art.meta_description or art.summary or art.subtitle }}"
+                 data-cover="{{ art.cover_image_url }}"
+                 data-words="{{ art.word_count }}"
+                 data-reading="{{ art.reading_time_minutes }}"
+                 data-tags="{% for t in art.tags %}#{{ t.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
+                 data-hero="{{ 'true' if art.is_hero else 'false' }}"
+                 data-zen="{{ 'true' if art.enable_zen_mode else 'false' }}"
+                 data-goocast="{{ 'true' if art.enable_goocast else 'false' }}"
+                 onclick="selectArticleForInspector(this)">
+
+          {% if art.is_hero %}
+          <!-- Optical Accent Glow on Highlight Post -->
+          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container shadow-sm shadow-primary-container"></div>
+          {% elif art.status == 'draft' %}
+          <!-- Draft Optical Left Border Indicator -->
+          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-outline-variant"></div>
+          {% endif %}
+
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md">
+            <div class="flex flex-col gap-1.5 max-w-2xl">
+              <div class="flex flex-wrap items-center gap-space-xs">
+                {% if art.is_hero %}
+                <span class="px-2 py-0.5 rounded font-label-badge text-label-badge bg-primary-container/20 text-primary-fixed-dim uppercase tracking-wider font-bold">
+                  ★ Destaque Principal
+                </span>
+                {% elif art.status == 'draft' %}
+                <span class="px-2 py-0.5 rounded font-label-badge text-label-badge bg-surface-container-highest text-on-surface-variant uppercase tracking-wider font-bold">
+                  ✎ Rascunho Ativo
+                </span>
+                {% elif art.status == 'review' %}
+                <span class="px-2 py-0.5 rounded font-label-badge text-label-badge bg-primary-container/20 text-primary uppercase tracking-wider font-bold">
+                  ⏳ Em Revisão
+                </span>
+                {% endif %}
+
+                <span class="px-2 py-0.5 rounded font-label-badge text-label-badge {% if art.category and art.category.color_theme == 'carmine' %}bg-tertiary-container/30 text-tertiary{% else %}bg-secondary-container/40 text-secondary-fixed{% endif %} uppercase">
+                  {{ art.category.name if art.category else 'Engenharia & POP' }}
+                </span>
+                <span class="text-on-surface-variant font-telemetry-code text-body-sm">
+                  /blog/{{ art.slug }}
+                </span>
+              </div>
+
+              <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-primary transition-colors">
+                {{ art.title }}
+              </h2>
+
+              <div class="flex flex-wrap items-center gap-space-md text-on-surface-variant font-body-sm text-body-sm pt-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-tertiary">{% if art.author_key == 'duo' %}group{% else %}person{% endif %}</span>
+                  <span class="text-on-surface font-medium">{{ art.author_display }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] {% if art.status == 'draft' %}text-on-surface-variant{% else %}text-secondary{% endif %}">
+                    {% if art.status == 'draft' %}visibility_off{% else %}visibility{% endif %}
+                  </span>
+                  <span class="font-telemetry-code {% if art.status == 'draft' %}text-on-surface-variant{% else %}text-on-surface{% endif %}">
+                    {% if art.status == 'draft' %}0 leituras (não publicado){% else %}{{ art.formatted_views }} leituras{% endif %}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+                  <span class="font-telemetry-code text-on-surface">{{ art.reading_time_minutes }} min {% if art.status == 'draft' %}estimado{% else %}de leitura{% endif %}</span>
+                </div>
+              </div>
+
+              <!-- Tags -->
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                {% for t in art.tags %}
+                <span class="font-telemetry-code text-label-badge bg-surface-container-lowest px-2 py-0.5 rounded text-tertiary">#{{ t.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Row Actions -->
+            <div class="flex flex-wrap lg:flex-col items-end gap-space-xs w-full lg:w-auto mt-space-sm lg:mt-0 pt-space-sm lg:pt-0">
+              {% if art.status == 'draft' %}
+              <a href="{{ url_for('cms.editor', article_id=art.id) }}" class="w-full lg:w-40 flex items-center justify-center gap-1.5 px-space-md py-2 rounded bg-tertiary-container hover:bg-tertiary-container/80 text-on-tertiary-container font-headline-sm text-body-sm font-semibold transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">edit_note</span>
+                <span>Continuar Editando</span>
+              </a>
+              <button onclick="changeArticleStatus({{ art.id }}, 'published', event)" class="w-full lg:w-40 flex items-center justify-center gap-1.5 px-space-md py-1.5 rounded bg-surface-container-lowest hover:bg-surface-bright text-tertiary font-telemetry-code text-telemetry-code transition-all">
+                <span class="material-symbols-outlined text-[16px]">publish</span>
+                <span>Publicar Agora</span>
+              </button>
+              {% else %}
+              <a href="{{ url_for('cms.editor', article_id=art.id) }}" class="w-full lg:w-36 flex items-center justify-center gap-1.5 px-space-md py-2 rounded {% if art.is_hero %}bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm font-semibold{% else %}bg-surface-container-lowest hover:bg-surface-bright text-on-surface font-body-sm{% endif %} text-body-sm transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+                <span>{% if art.is_hero %}Editar Ensaio{% else %}Editar{% endif %}</span>
+              </a>
+              <div class="flex items-center gap-1 w-full lg:w-auto justify-end">
+                <a href="{{ url_for('public.article_detail', slug=art.slug) }}" target="_blank" onclick="event.stopPropagation()" class="p-2 rounded bg-surface-container-lowest hover:bg-surface-bright text-tertiary transition-colors" title="Ver ao Vivo">
+                  <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                </a>
+                <button onclick="duplicateArticle({{ art.id }}, event)" class="p-2 rounded bg-surface-container-lowest hover:bg-surface-bright text-on-surface-variant hover:text-on-surface transition-colors" title="Duplicar Ensaio">
+                  <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                </button>
+                <button onclick="deleteArticle({{ art.id }}, event)" class="p-2 rounded bg-surface-container-lowest hover:bg-error-container/40 text-on-surface-variant hover:text-error transition-colors" title="Excluir Ensaio">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Column: SEO Preview, Metadata Inspector & Technical Validation Drawer (4 cols in 2xl) -->
+    <aside class="2xl:col-span-4 flex flex-col gap-space-md">
+      <!-- Drawer Header & Context Selector -->
+      <div class="p-space-lg bg-surface-container rounded-xl shadow-md">
+        <div class="flex items-center justify-between pb-space-sm">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">tune</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Inspetor de Metadados</h3>
+          </div>
+          <span class="font-label-badge text-label-badge text-primary bg-primary-container/20 px-2 py-0.5 rounded">
+            Ensaio Ativo
+          </span>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Configuração de SEO, OpenGraph e parâmetros de roteamento para o artigo selecionado:
+        </p>
+        <div class="mt-space-sm p-space-sm bg-surface-container-lowest rounded-lg">
+          <p class="font-telemetry-code text-telemetry-code text-tertiary truncate" id="inspector-active-title">
+            &gt; {{ active_article.title if active_article else 'O Fim do Robô Burro no Provedor' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Real-Time SERP & Social OpenGraph Card Preview -->
+      <div class="p-space-lg bg-surface-container rounded-xl shadow-md flex flex-col gap-space-md">
+        <div class="flex items-center justify-between">
+          <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Snippet SERP Google • Desktop</span>
+          <span class="material-symbols-outlined text-[16px] text-tertiary">visibility</span>
+        </div>
+        <!-- Google SERP Card Simulation -->
+        <div class="p-space-md bg-surface-container-lowest rounded-lg flex flex-col gap-1 shadow-inner">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 rounded-full bg-primary-container flex items-center justify-center text-[10px] text-on-primary-container font-bold">G</div>
+            <span class="font-body-sm text-body-sm text-on-surface-variant truncate" id="inspector-serp-slug">
+              goosetecnologia.com.br › blog › {{ active_article.slug if active_article else 'fim-do-robo-burro' }}
+            </span>
+          </div>
+          <p class="font-headline-sm text-body-md text-secondary hover:underline cursor-pointer font-medium leading-tight" id="inspector-serp-title">
+            {{ active_article.title if active_article else 'O Fim do Robô Burro no Provedor' }} | Goose
+          </p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 leading-relaxed" id="inspector-serp-desc">
+            {{ (active_article.meta_description or active_article.summary) if active_article else 'Descubra como integrar IA generativa ao WhatsApp do seu ISP sem desumanizar o suporte.' }}
+          </p>
+        </div>
+
+        <!-- OpenGraph Media Card Simulation -->
+        <div class="flex flex-col gap-2">
+          <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Card OpenGraph (LinkedIn / X)</span>
+          <div class="overflow-hidden rounded-lg bg-surface-container-lowest shadow-inner">
+            <img id="inspector-og-img" class="w-full h-36 object-cover" alt="OpenGraph Preview"
+                 src="{{ active_article.cover_image_url if active_article else 'https://lh3.googleusercontent.com/aida-public/AB6AXuBslv9TK00mE-wVh8pomOZINqxHbdmccCT9jyrWLfIujDYnMhepHbMlmxc4CPLtI2GkfRijpN_eMRCIOphcV1Xwy2yJEFu-AOV27UWQwu0eBpB0ljjA0RkiKkyjOag288joyeMcjKK55ugul9RVp_N585HbpjzAMGrYP3fLSg0n6dDhtL4MJR1tki7E3tJj_Rgoc4hU9XG6Dr50epAa6KZ_vcTSMAAeJ1FuiDHNqHU' }}" />
+            <div class="p-space-sm bg-surface-container-high/90 flex flex-col gap-1">
+              <span class="font-label-badge text-label-badge text-tertiary">GOOSETECNOLOGIA.COM.BR</span>
+              <p class="font-headline-sm text-body-sm font-semibold text-on-surface truncate" id="inspector-og-title">
+                {{ active_article.title if active_article else 'O Fim do Robô Burro no Provedor...' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Switches & Editorial Modes -->
+      <div class="p-space-lg bg-surface-container rounded-xl shadow-md flex flex-col gap-space-md">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Comportamento Editorial</span>
+        <!-- Switch 1: Hero Pin -->
+        <label class="flex items-center justify-between cursor-pointer group">
+          <div class="flex flex-col pr-space-md">
+            <span class="font-headline-sm text-body-sm font-medium text-on-surface group-hover:text-primary transition-colors">
+              Fixar no Destaque do Topo (Hero)
+            </span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">
+              Eleva o artigo ao banner principal do blog com diagramas dinâmicos.
+            </span>
+          </div>
+          <div class="relative inline-flex items-center shrink-0">
+            <input id="inspector-switch-hero" {% if active_article and active_article.is_hero %}checked{% endif %} class="sr-only peer" type="checkbox" />
+            <div class="w-11 h-6 bg-surface-container-lowest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface peer-checked:bg-primary-container after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </div>
+        </label>
+
+        <!-- Switch 2: Zen Mode -->
+        <label class="flex items-center justify-between cursor-pointer group">
+          <div class="flex flex-col pr-space-md">
+            <span class="font-headline-sm text-body-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">
+              Habilitar Modo Zen no Artigo
+            </span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">
+              Remove banners de conversão para foco total em código e comandos.
+            </span>
+          </div>
+          <div class="relative inline-flex items-center shrink-0">
+            <input id="inspector-switch-zen" {% if not active_article or active_article.enable_zen_mode %}checked{% endif %} class="sr-only peer" type="checkbox" />
+            <div class="w-11 h-6 bg-surface-container-lowest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface peer-checked:bg-secondary-container after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </div>
+        </label>
+
+        <!-- Switch 3: Podcast Link -->
+        <label class="flex items-center justify-between cursor-pointer group">
+          <div class="flex flex-col pr-space-md">
+            <span class="font-headline-sm text-body-sm font-medium text-on-surface group-hover:text-secondary transition-colors">
+              Disponibilizar no GOOCAST Podcast
+            </span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">
+              Gera síntese por voz neural para streaming no feed Spotify.
+            </span>
+          </div>
+          <div class="relative inline-flex items-center shrink-0">
+            <input id="inspector-switch-goocast" {% if active_article and active_article.enable_goocast %}checked{% endif %} class="sr-only peer" type="checkbox" />
+            <div class="w-11 h-6 bg-surface-container-lowest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface peer-checked:bg-tertiary-container after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Technical Engineering Validation Checklist -->
+      <div class="p-space-lg bg-surface-container rounded-xl shadow-md flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between">
+          <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Validação Técnica Telecom</span>
+          <span class="font-telemetry-code text-label-badge text-tertiary">3 / 3 CHECKS OK</span>
+        </div>
+        <ul class="flex flex-col gap-2 mt-2">
+          <li class="flex items-start gap-2 p-2 bg-surface-container-lowest rounded-lg">
+            <span class="material-symbols-outlined text-tertiary text-[18px] shrink-0 mt-0.5">check_circle</span>
+            <div class="flex flex-col">
+              <span class="font-body-sm text-body-sm text-on-surface font-medium">Tempo de Leitura Calculado</span>
+              <span class="font-telemetry-code text-label-badge text-on-surface-variant" id="inspector-check-reading">
+                {{ active_article.word_count if active_article else 1420 }} palavras → {{ active_article.reading_time_minutes if active_article else 7 }} min precisão NOC
+              </span>
+            </div>
+          </li>
+          <li class="flex items-start gap-2 p-2 bg-surface-container-lowest rounded-lg">
+            <span class="material-symbols-outlined text-tertiary text-[18px] shrink-0 mt-0.5">check_circle</span>
+            <div class="flex flex-col">
+              <span class="font-body-sm text-body-sm text-on-surface font-medium">Taxonomia &amp; Tags ISP Vinculadas</span>
+              <span class="font-telemetry-code text-label-badge text-on-surface-variant" id="inspector-check-tags">
+                Tags ativas ({% if active_article %}{% for t in active_article.tags %}#{{ t.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}#WhatsApp, #TR-069, #RADIUS{% endif %})
+              </span>
+            </div>
+          </li>
+          <li class="flex items-start gap-2 p-2 bg-surface-container-lowest rounded-lg">
+            <span class="material-symbols-outlined text-tertiary text-[18px] shrink-0 mt-0.5">check_circle</span>
+            <div class="flex flex-col">
+              <span class="font-body-sm text-body-sm text-on-surface font-medium">Sintaxe RouterOS v7 Validada</span>
+              <span class="font-telemetry-code text-label-badge text-on-surface-variant">Terminal scripts aprovados sem erro de parser</span>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Fast Update Action -->
+        <button onclick="saveInspectorMetadata()" class="w-full mt-space-sm py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-headline-sm text-body-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2" id="save-metadata-btn">
+          <span class="material-symbols-outlined text-[18px] text-tertiary">save</span>
+          <span>Gravar Alterações de SEO</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- PAINEL SECUNDÁRIO: TÓPICOS & TELECOM -->
+  <div id="cms-pane-topics" class="cms-view-pane hidden flex-col gap-space-md">
+    <div class="p-space-lg bg-surface-container rounded-xl shadow-md">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Silos Técnicos &amp; Taxonomia de Tags ISP</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {% for cat in categories %}
+        <div class="p-4 rounded-lg bg-surface-container-lowest border border-white/5 flex flex-col gap-1">
+          <span class="font-label-badge text-label-badge text-tertiary uppercase">{{ cat.slug }}</span>
+          <span class="font-headline-sm text-on-surface font-bold">{{ cat.name }}</span>
+          <span class="font-telemetry-code text-body-sm text-on-surface-variant">{{ cat.articles.count() }} artigos vinculados</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {% for t in tags %}
+        <span class="px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-white/5 font-telemetry-code text-telemetry-code text-secondary">
+          #{{ t.name }} <span class="text-on-surface-variant">({{ t.articles|length }})</span>
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL SECUNDÁRIO: MÉTRICAS & LEADS CAPTURADOS -->
+  <div id="cms-pane-leads" class="cms-view-pane hidden flex-col gap-space-md">
+    <div class="p-space-lg bg-surface-container rounded-xl shadow-md">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Leads de Engenharia Capturados (Provedores / ASNs)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-telemetry-code text-body-sm">
+          <thead class="bg-surface-container-lowest text-tertiary uppercase">
+            <tr>
+              <th class="p-3">Data</th>
+              <th class="p-3">Contato</th>
+              <th class="p-3">Provedor / ASN</th>
+              <th class="p-3">WhatsApp</th>
+              <th class="p-3">Origem</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {% for lead in leads %}
+            <tr class="hover:bg-surface-container-high/40">
+              <td class="p-3 text-on-surface-variant">{{ lead.created_at.strftime('%d/%m/%Y %H:%M') if lead.created_at else '-' }}</td>
+              <td class="p-3 text-on-surface font-semibold">{{ lead.name }}</td>
+              <td class="p-3 text-secondary">{{ lead.isp_asn }}</td>
+              <td class="p-3 text-primary">{{ lead.whatsapp }}</td>
+              <td class="p-3 text-on-surface-variant">{{ lead.source_page }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL SECUNDÁRIO: REPOSITÓRIO DE MÍDIA -->
+  <div id="cms-pane-media" class="cms-view-pane hidden flex-col gap-space-md">
+    <div class="p-space-lg bg-surface-container rounded-xl shadow-md">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Repositório de Mídia &amp; Diagramas Ópticos</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for asset in media_assets %}
+        <div class="rounded-xl overflow-hidden bg-surface-container-lowest border border-white/5 flex flex-col">
+          <img src="{{ asset.file_url }}" alt="{{ asset.alt_text }}" class="w-full h-40 object-cover bg-surface-container" />
+          <div class="p-3 flex flex-col gap-1">
+            <span class="font-telemetry-code text-body-sm text-on-surface truncate">{{ asset.filename }}</span>
+            <span class="font-body-sm text-on-surface-variant text-xs truncate">{{ asset.alt_text }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL SECUNDÁRIO: AUTORES & REDATORES (CRUD COMPLETO) -->
+  <div id="cms-pane-authors" class="cms-view-pane hidden flex-col gap-space-md">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+      <!-- Lista de Autores e Redatores Cadastrados (7 cols) -->
+      <div class="xl:col-span-7 p-space-lg bg-surface-container rounded-xl shadow-md flex flex-col gap-space-md">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-space-sm border-b border-white/5">
+          <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Conselho Editorial &amp; Redatores Técnicos</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Gerencie os autores que assinam os artigos e possuem acesso ao Goose CMS.
+            </p>
+          </div>
+          <button type="button" onclick="resetAuthorForm()" class="flex items-center gap-1.5 px-space-md py-2 rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-body-sm font-bold shadow-sm transition-all">
+            <span class="material-symbols-outlined text-[18px]">person_add</span>
+            <span>Novo Autor / Redator</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4" id="authors-list-grid">
+          {% for u in users %}
+          <div class="p-4 rounded-xl bg-surface-container-lowest border border-white/5 hover:border-tertiary/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+               id="author-card-{{ u.id }}"
+               data-id="{{ u.id }}"
+               data-username="{{ u.username }}"
+               data-email="{{ u.email }}"
+               data-display-name="{{ u.display_name }}"
+               data-role-title="{{ u.role_title }}"
+               data-avatar-url="{{ u.avatar_url or '' }}"
+               data-bio="{{ u.bio or '' }}">
+            <div class="flex items-start sm:items-center gap-4">
+              <img src="{{ u.avatar_url or 'https://lh3.googleusercontent.com/aida-public/AB6AXuCv2wN6Zl7YGCG44IolCNUScJ9kzQwH4ou8YYmvT8DbT5KBbGi4LOXzsVjFMcQlDhliLO5SJiH9HqmzRmaYWeO1N6vZIdkqSfDkOCKJ5e20cYUraU22Ysk-jfB2adM45hzWGs6bKago7yoNPH5QLO2knCSq0J932Ak_DeOpKkt6eEzSX62lbP83ezejW3QorHKjLQJhiksTfZ6OgmY4h4aixpFvsx3RUyFSJFR4hkk' }}"
+                   alt="{{ u.display_name }}"
+                   class="w-14 h-14 rounded-full object-cover ring-2 ring-primary-container/50 shrink-0" />
+              <div class="flex flex-col">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-headline-sm text-on-surface font-bold">{{ u.display_name }}</span>
+                  <span class="px-2 py-0.5 rounded bg-tertiary-container/25 text-tertiary font-telemetry-code text-[11px]">{{ u.role_title }}</span>
+                </div>
+                <span class="font-telemetry-code text-body-sm text-on-surface-variant mt-0.5">
+                  @{{ u.username }} • {{ u.email }}
+                </span>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">{{ u.bio }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+              <button type="button"
+                      onclick="editAuthorFromCard(document.getElementById('author-card-{{ u.id }}'))"
+                      class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-bright text-on-surface font-body-sm text-body-sm transition-all"
+                      title="Editar Autor">
+                <span class="material-symbols-outlined text-[16px] text-tertiary">edit</span>
+                <span>Editar</span>
+              </button>
+              <button type="button"
+                      onclick="deleteAuthor({{ u.id }}, '{{ u.display_name | e }}')"
+                      class="p-1.5 rounded-lg bg-surface-container hover:bg-error-container/40 text-on-surface-variant hover:text-error transition-all"
+                      title="Excluir Autor">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Formulário Lateral de Criação / Edição de Autor (5 cols) -->
+      <div class="xl:col-span-5 p-space-lg bg-surface-container rounded-xl shadow-md flex flex-col gap-space-md">
+        <div class="flex items-center justify-between pb-space-sm border-b border-white/5">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">badge</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold" id="author-form-title">
+              Cadastrar Novo Autor / Redator
+            </h3>
+          </div>
+          <span class="font-label-badge text-label-badge text-secondary bg-secondary-container/30 px-2 py-0.5 rounded" id="author-form-badge">
+            NOVO REGISTRO
+          </span>
+        </div>
+
+        <form id="cms-author-form" onsubmit="saveAuthorForm(event)" class="flex flex-col gap-space-md">
+          <input type="hidden" id="author-id-input" value="" />
+          <input type="file" id="author-avatar-file-input" class="hidden" accept="image/*" onchange="uploadAuthorAvatarFile(this)" />
+
+          <div class="flex flex-col gap-1">
+            <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Nome de Exibição *</label>
+            <input type="text" id="author-display-name-input" required
+                   placeholder="Ex: Rodrigo Almeida ou Francisco Santos"
+                   class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+            <div class="flex flex-col gap-1">
+              <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Cargo / Especialidade *</label>
+              <input type="text" id="author-role-input" required
+                     placeholder="Ex: Engenheiro BGP / Redator ISP"
+                     class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Identificador (Username)</label>
+              <input type="text" id="author-username-input"
+                     placeholder="Ex: rodrigo"
+                     class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-telemetry-code text-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+            <div class="flex flex-col gap-1">
+              <label class="font-headline-sm text-body-sm text-on-surface font-semibold">E-mail de Acesso</label>
+              <input type="email" id="author-email-input"
+                     placeholder="Ex: rodrigo@goose.tec.br"
+                     class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-telemetry-code text-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Senha CMS (Opcional)</label>
+              <input type="password" id="author-password-input"
+                     placeholder="Padrão: goose2026"
+                     class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-telemetry-code text-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Foto / Avatar (URL ou Upload)</label>
+              <button type="button" onclick="document.getElementById('author-avatar-file-input').click()"
+                      class="text-tertiary hover:underline font-telemetry-code text-[11px] flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">upload</span> Enviar Foto
+              </button>
+            </div>
+            <input type="text" id="author-avatar-input"
+                   placeholder="https://... ou clique em Enviar Foto"
+                   class="w-full px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-telemetry-code text-body-sm border border-white/10 focus:outline-none focus:border-tertiary" />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="font-headline-sm text-body-sm text-on-surface font-semibold">Mini Bio Técnica (Rodapé dos Artigos)</label>
+            <textarea id="author-bio-input" rows="3"
+                      placeholder="Breve descrição da experiência técnica em Telecom, Redes, NOC ou Gestão de Provedores..."
+                      class="w-full p-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm border border-white/10 focus:outline-none focus:border-tertiary leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2 pt-2">
+            <button type="submit" id="author-save-btn"
+                    class="flex-1 py-2.5 px-4 rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-body-sm font-bold shadow-md transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">save</span>
+              <span id="author-save-btn-label">Salvar Autor / Redator</span>
+            </button>
+            <button type="button" onclick="resetAuthorForm()"
+                    class="py-2.5 px-4 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all">
+              Limpar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL SECUNDÁRIO: LOGS DE AUDITORIA -->
+  <div id="cms-pane-logs" class="cms-view-pane hidden flex-col gap-space-md">
+    <div class="p-space-lg bg-surface-container rounded-xl shadow-md">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Logs de Publicação &amp; Auditoria NOC</h2>
+      <div class="flex flex-col gap-2 font-telemetry-code text-telemetry-code">
+        {% for log in audit_logs %}
+        <div class="p-3 rounded-lg bg-surface-container-lowest border border-white/5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-badge">{{ log.action }}</span>
+            <span class="text-on-surface">{{ log.details }}</span>
+          </div>
+          <div class="text-on-surface-variant text-xs">
+            {{ log.actor_name }} • {{ log.created_at.strftime('%d/%m/%Y %H:%M:%S') if log.created_at else '' }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cms_dashboard.js') }}"></script>
+{% endblock %}
+

@@ -1,0 +1,447 @@
+/* ==========================================================================
+   GOOSE TECNOLOGIA — Design System Telecom NOC & FTTH (Stitch ID 2523588531873957096)
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #080D1A;
+  color: #E2E8F0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background-color: #E12B4A;
+  color: #FFFFFF;
+}
+
+/* Custom Scrollbar Discreta NOC */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #060e20;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C2742;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #296B96;
+}
+
+/* Range Input Customizado */
+input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #296B96;
+  border: 2px solid #E2E8F0;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   VÍDEOS & EMBEDS RESPONSIVOS (YouTube / Vimeo nos Artigos e Preview CMS)
+   ========================================================================== */
+article iframe,
+#preview-body iframe,
+#article-modal-body iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  border-radius: 0.75rem;
+  border: 1px solid #1C2742;
+  margin: 1rem 0;
+  display: block;
+}
+
+/* ==========================================================================
+   MODO ZEN (Home e Página de Artigo)
+   ========================================================================== */
+body.zen-mode #main-header,
+body.zen-mode #bicolor-top-line,
+body.zen-mode #article-sidebar,
+body.zen-mode #article-extra-sections,
+body.zen-mode #main-footer,
+body.zen-mode #back-to-top {
+  display: none !important;
+}
+
+body.zen-mode main {
+  padding-top: 3rem !important;
+}
+
+body.zen-mode #article-content-wrapper {
+  max-width: 48rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ==========================================================================
+   TEMA CLARO (ENGINEERING LIGHT MODE)
+   ========================================================================== */
+html.light-mode body {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html.light-mode #main-header {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode #reading-progress-wrapper > div:first-child {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.light-mode #reading-progress-badge {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light-mode #reading-progress-badge .text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode #reading-progress-badge #reading-time-remaining {
+  color: #334155 !important;
+}
+
+html.light-mode #zen-floating-bar {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light-mode #zen-floating-bar button {
+  color: #0f172a !important;
+}
+
+html.light-mode #main-header nav a:not(.text-white) {
+  color: #64748b !important;
+}
+
+html.light-mode #main-header nav a.text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode #main-header nav a:hover {
+  color: #0284c7 !important;
+}
+
+html.light-mode #main-header button,
+html.light-mode #main-header a.rounded-full,
+html.light-mode #main-header .xl\:flex,
+html.light-mode #main-header .lg\:flex {
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+  background-color: #f1f5f9 !important;
+}
+
+html.light-mode #main-header button:hover,
+html.light-mode #main-header a.rounded-full:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html.light-mode h1,
+html.light-mode h2,
+html.light-mode h3,
+html.light-mode h4 {
+  color: #0f172a !important;
+}
+
+html.light-mode article p,
+html.light-mode .text-\[\#8E9EB5\] {
+  color: #475569 !important;
+}
+
+html.light-mode article .text-white,
+html.light-mode strong.text-white,
+html.light-mode em.text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode code.bg-\[\#080D1A\] {
+  background-color: #e2e8f0 !important;
+  color: #c01938 !important;
+}
+
+html.light-mode #goocast-player {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light-mode #goocast-player .text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode #article-sidebar > div {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light-mode .toc-link {
+  color: #64748b !important;
+}
+
+html.light-mode .toc-link:hover,
+html.light-mode .toc-link.bg-\[\#101930\] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light-mode aside .bg-\[\#101930\]\/40 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode aside .bg-\[\#101930\]\/40 .text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode .bg-\[\#101930\]\/90 {
+  background-color: #fdf2f4 !important;
+  border-color: #fecdd3 !important;
+  border-left-color: #E12B4A !important;
+}
+
+html.light-mode .bg-\[\#101930\]\/90 .font-heading {
+  color: #9f1239 !important;
+}
+
+html.light-mode .bg-\[\#080D1A\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode .bg-\[\#101930\] {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode pre {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light-mode pre code span.text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode pre code span.text-\[\#8E9EB5\] {
+  color: #64748b !important;
+}
+
+html.light-mode pre code span.text-\[\#4A90E2\] {
+  color: #0284c7 !important;
+}
+
+html.light-mode pre code span.text-\[\#E12B4A\] {
+  color: #be123c !important;
+}
+
+html.light-mode table thead {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+html.light-mode table td.text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode #sec-checklist label {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode #sec-checklist label:hover {
+  border-color: #0284c7 !important;
+  background-color: #f8fafc !important;
+}
+
+html.light-mode #sec-checklist label span.text-white {
+  color: #1e293b !important;
+}
+
+html.light-mode svg text.fill-white {
+  fill: #0f172a !important;
+}
+
+html.light-mode svg text.fill-\[\#8E9EB5\] {
+  fill: #64748b !important;
+}
+
+html.light-mode svg rect.fill-\[\#101930\] {
+  fill: #f8fafc !important;
+  stroke: #cbd5e1 !important;
+}
+
+html.light-mode #article-extra-sections a.group,
+html.light-mode #comentarios form,
+html.light-mode #comentarios [id^="comment-card-"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+}
+
+html.light-mode #comentarios input,
+html.light-mode #comentarios textarea {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light-mode #comentarios p.text-\[\#E2E8F0\] {
+  color: #334155 !important;
+}
+
+html.light-mode #main-footer {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode #back-to-top {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ==========================================================================
+   OTIMIZAÇÃO DEDICADA PARA IMPRESSÃO E EXPORTAÇÃO PDF (@media print)
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 1.6cm 1.4cm 1.8cm 1.4cm;
+    size: A4 portrait;
+  }
+  body {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+  #reading-progress-wrapper,
+  #zen-floating-bar,
+  #back-to-top,
+  #goocast-player,
+  #article-sidebar,
+  #article-extra-sections,
+  #comentarios,
+  #main-header nav,
+  #main-header button,
+  #main-header a.rounded-full,
+  #print-pdf-btn,
+  #theme-toggle-btn,
+  #zen-mode-toggle-btn,
+  .copy-code-btn,
+  button {
+    display: none !important;
+  }
+  #main-header {
+    position: static !important;
+    border-bottom: 2px solid #e5e7eb !important;
+    background: transparent !important;
+    padding-bottom: 0.8cm !important;
+    margin-bottom: 0.8cm !important;
+    height: auto !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  #article-content-wrapper {
+    max-width: 100% !important;
+  }
+  .grid.grid-cols-1.lg\:grid-cols-12 {
+    display: block !important;
+  }
+  article {
+    width: 100% !important;
+    color: #1f2937 !important;
+  }
+  h1 {
+    font-size: 24pt !important;
+    line-height: 1.2 !important;
+    color: #0f172a !important;
+  }
+  h2 {
+    font-size: 15pt !important;
+    color: #0f172a !important;
+    margin-top: 1.2cm !important;
+  }
+  p, li {
+    color: #374151 !important;
+    font-size: 10.5pt !important;
+  }
+  strong, em, .text-white {
+    color: #111827 !important;
+  }
+  .text-\[\#8E9EB5\] {
+    color: #4b5563 !important;
+  }
+  .text-\[\#4A90E2\] {
+    color: #0284c7 !important;
+  }
+  .text-\[\#E12B4A\] {
+    color: #be123c !important;
+  }
+  pre, .overflow-hidden, section, .my-3 {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  pre {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    padding: 10px !important;
+    font-size: 8.5pt !important;
+    border-radius: 4px !important;
+  }
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+  table th, table td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 10px !important;
+    color: #1f2937 !important;
+    font-size: 9pt !important;
+  }
+  table thead {
+    background-color: #f1f5f9 !important;
+  }
+  table thead th {
+    color: #0f172a !important;
+  }
+  svg text {
+    fill: #111827 !important;
+  }
+  svg rect {
+    stroke: #94a3b8 !important;
+    fill: #f8fafc !important;
+  }
+  #print-footer-banner {
+    display: block !important;
+  }
+  #main-footer {
+    display: none !important;
+  }
+}
+

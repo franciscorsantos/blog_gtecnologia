@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="web_dashboard" name="shell-type" />
+  <title>{% block title %}Goose CMS v2.4 — Estúdio Editorial Telecom{% endblock %}</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #060e20; }
+    ::-webkit-scrollbar-thumb { background: #222a3d; border-radius: 9999px; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-variant": "#2d3449",
+            "surface-container-low": "#131b2e",
+            "on-secondary-container": "#8dc9f9",
+            "on-surface": "#dae2fd",
+            "on-background": "#dae2fd",
+            "surface-container-lowest": "#060e20",
+            "on-secondary": "#00344f",
+            "secondary": "#91cdfd",
+            "secondary-fixed-dim": "#91cdfd",
+            "on-error-container": "#ffdad6",
+            "primary-fixed-dim": "#ffb3b5",
+            "on-error": "#690005",
+            "on-primary-fixed": "#40000b",
+            "on-tertiary-fixed-variant": "#004e60",
+            "on-primary-fixed-variant": "#920026",
+            "surface-container": "#171f33",
+            "inverse-primary": "#be0335",
+            "secondary-container": "#00557f",
+            "tertiary-container": "#05819e",
+            "primary": "#ffb3b5",
+            "outline": "#ab8889",
+            "on-secondary-fixed-variant": "#004b71",
+            "error-container": "#93000a",
+            "surface-dim": "#0b1326",
+            "inverse-on-surface": "#283044",
+            "tertiary-fixed": "#b7eaff",
+            "outline-variant": "#5b4040",
+            "primary-container": "#e12b4a",
+            "tertiary-fixed-dim": "#77d2f2",
+            "background": "#0b1326",
+            "inverse-surface": "#dae2fd",
+            "surface-container-high": "#222a3d",
+            "secondary-fixed": "#cbe6ff",
+            "on-tertiary": "#003543",
+            "tertiary": "#77d2f2",
+            "surface-container-highest": "#2d3449",
+            "surface": "#0b1326",
+            "on-tertiary-container": "#ffffff",
+            "on-secondary-fixed": "#001e30",
+            "on-primary": "#680018",
+            "on-tertiary-fixed": "#001f28",
+            "surface-tint": "#ffb3b5",
+            "on-surface-variant": "#e4bdbe",
+            "primary-fixed": "#ffdada",
+            "surface-bright": "#31394d",
+            "on-primary-container": "#ffffff",
+            "error": "#ffb4ab"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          },
+          spacing: {
+            gutter: "1.5rem",
+            "space-sm": "0.5rem",
+            margin: "2rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem"
+          },
+          fontFamily: {
+            "telemetry-code": ["JetBrains Mono", "monospace"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "display-hero-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "display-hero": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "label-badge": ["JetBrains Mono", "monospace"],
+            "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"]
+          },
+          fontSize: {
+            "telemetry-code": ["13px", { lineHeight: "18px", letterSpacing: "0.02em", fontWeight: "500" }],
+            "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+            "display-hero-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "display-hero": ["48px", { lineHeight: "56px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "label-badge": ["11px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "700" }],
+            "headline-sm": ["18px", { lineHeight: "26px", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
+  <!-- SIDEBAR FIXA GOOSE CMS -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
+    <div class="flex flex-col">
+      <div class="h-16 px-space-md flex items-center justify-between bg-surface-container-lowest/60">
+        <a href="{{ url_for('cms.dashboard') }}" class="flex items-center gap-space-sm">
+          <div class="w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_12px_rgba(225,43,74,0.6)]"></div>
+          <span class="font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface">GOOSE <span class="text-tertiary">CMS</span></span>
+        </a>
+        <span class="font-label-badge text-label-badge text-tertiary bg-tertiary-container/20 px-space-xs py-0.5 rounded">V2.4</span>
+      </div>
+      <!-- Assinatura Bicolor 50/50 -->
+      <div class="w-full h-[3px] flex">
+        <div class="w-1/2 h-full bg-primary-container"></div>
+        <div class="w-1/2 h-full bg-secondary-container"></div>
+      </div>
+
+      <div class="px-space-md py-space-sm">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Estúdio Editorial</span>
+      </div>
+      <nav class="flex flex-col gap-space-xs px-space-sm">
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg {% if request.endpoint == 'cms.dashboard' %}bg-surface-container-high text-on-surface font-semibold shadow-inner{% else %}text-on-surface-variant hover:bg-surface-container hover:text-on-surface{% endif %} transition-all"
+           href="{{ url_for('cms.dashboard') }}"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('articles', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">article</span>
+          <span class="font-body-md text-body-md">Artigos &amp; Ensaios</span>
+        </a>
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg {% if request.endpoint == 'cms.editor' %}bg-surface-container-high text-on-surface font-semibold shadow-inner{% else %}text-on-surface-variant hover:bg-surface-container hover:text-on-surface{% endif %} transition-all"
+           href="{{ url_for('cms.editor') }}">
+          <span class="material-symbols-outlined text-[18px]">code_blocks</span>
+          <span class="font-body-md text-body-md">Editor Markdown</span>
+        </a>
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
+           href="{{ url_for('cms.dashboard') }}#topicos"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('topics', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">hub</span>
+          <span class="font-body-md text-body-md">Tópicos &amp; Telecom</span>
+        </a>
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
+           href="{{ url_for('cms.dashboard') }}#leads"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('leads', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">monitoring</span>
+          <span class="font-body-md text-body-md">Métricas &amp; Leads</span>
+        </a>
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
+           href="{{ url_for('cms.dashboard') }}#midia"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('media', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">perm_media</span>
+          <span class="font-body-md text-body-md">Mídia &amp; Diagramas</span>
+        </a>
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
+           href="{{ url_for('cms.dashboard') }}#autores"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('authors', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">badge</span>
+          <span class="font-body-md text-body-md">Autores &amp; Redatores</span>
+        </a>
+      </nav>
+
+      <div class="px-space-md pt-space-lg pb-space-xs">
+        <span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Infraestrutura</span>
+      </div>
+      <nav class="flex flex-col gap-space-xs px-space-sm">
+        <a class="cms-nav-link flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
+           href="{{ url_for('cms.dashboard') }}#logs"
+           {% if request.endpoint == 'cms.dashboard' %}onclick="switchCmsSection('logs', this); return false;"{% endif %}>
+          <span class="material-symbols-outlined text-[18px]">terminal</span>
+          <span class="font-body-md text-body-md">Logs de Publicação</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-all"
+           href="{{ url_for('auth.logout') }}">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span class="font-body-md text-body-md">Encerrar Sessão</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-space-md bg-surface-container-lowest/80">
+      <div class="flex items-center justify-between p-space-sm bg-surface-container rounded-lg">
+        <div class="flex items-center gap-space-sm">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+          </span>
+          <span class="font-telemetry-code text-telemetry-code text-on-surface">Edge CDN: OK</span>
+        </div>
+        <span class="font-label-badge text-label-badge text-tertiary">0.14ms</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL -->
+  <div class="pl-64">
+    <header class="fixed top-0 left-64 right-0 h-16 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.25)]">
+      <div class="h-16 w-full px-space-lg flex items-center justify-between">
+        <div class="flex items-center gap-space-md">
+          <div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+            <a href="{{ url_for('cms.dashboard') }}" class="text-on-surface font-medium hover:text-tertiary">Goose CMS</a>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span class="text-tertiary font-telemetry-code text-telemetry-code" id="cms-breadcrumb-current">
+              {% block breadcrumb %}Artigos &amp; Ensaios{% endblock %}
+            </span>
+          </div>
+          <div class="hidden xl:flex items-center gap-space-xs bg-surface-container-high px-space-sm py-1 rounded-full">
+            <span class="inline-block w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(119,210,242,0.6)]"></span>
+            <span class="font-label-badge text-label-badge text-on-surface tracking-wider uppercase">Produção sincronizada</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-space-md">
+          <a class="hidden sm:flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-all" href="{{ url_for('public.index') }}" target="_blank">
+            <span class="material-symbols-outlined text-[16px] text-tertiary">open_in_new</span>
+            <span>Ver Blog Público</span>
+          </a>
+          <a href="{{ url_for('cms.editor', new=1) }}" class="flex items-center gap-space-xs px-space-md py-space-sm rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline-sm text-body-md font-bold shadow-[0_0_16px_rgba(225,43,74,0.35)] transition-all">
+            <span class="material-symbols-outlined text-[18px]">edit_square</span>
+            <span>Novo Artigo</span>
+          </a>
+          <div class="h-6 w-[1px] bg-surface-container-highest"></div>
+          <div class="flex items-center gap-space-sm">
+            <div class="flex flex-col text-right hidden lg:block">
+              <span class="font-headline-sm text-body-sm font-semibold text-on-surface leading-tight">
+                {{ current_user.display_name if current_user.is_authenticated else 'Francisco & Wandeson' }}
+              </span>
+              <span class="font-telemetry-code text-label-badge text-tertiary">
+                {{ current_user.role_title if current_user.is_authenticated else 'Lead Telecom Ops' }}
+              </span>
+            </div>
+            <img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/40"
+                 src="{{ current_user.avatar_url if (current_user.is_authenticated and current_user.avatar_url) else 'https://lh3.googleusercontent.com/aida-public/AB6AXuCv2wN6Zl7YGCG44IolCNUScJ9kzQwH4ou8YYmvT8DbT5KBbGi4LOXzsVjFMcQlDhliLO5SJiH9HqmzRmaYWeO1N6vZIdkqSfDkOCKJ5e20cYUraU22Ysk-jfB2adM45hzWGs6bKago7yoNPH5QLO2knCSq0J932Ak_DeOpKkt6eEzSX62lbP83ezejW3QorHKjLQJhiksTfZ6OgmY4h4aixpFvsx3RUyFSJFR4hkk' }}" />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative pt-16 w-full min-h-screen bg-background px-space-lg py-space-xl">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
+

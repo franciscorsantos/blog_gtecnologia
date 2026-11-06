@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>{% block title %}GTECNOLOGIA — Telecom, Redes Ópticas & ISPs{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Blog Goose Tecnologia: Arquitetura BGP, FTTH, TR-069, e Gestão de Provedores de Internet.{% endblock %}" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              carmine: "#E12B4A",
+              blue: "#4A90E2",
+              petroleum: "#296B96",
+              dark: "#080D1A",
+              surface: "#0B1326",
+              panel: "#101930",
+              border: "#1C2742",
+              textMuted: "#8E9EB5",
+              textLight: "#E2E8F0"
+            }
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_classes %}bg-[#080D1A] font-sans antialiased text-[#E2E8F0] selection:bg-[#E12B4A] selection:text-white min-h-screen flex flex-col{% endblock %}">
+  {% block content %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>
+
