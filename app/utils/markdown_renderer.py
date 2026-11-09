@@ -49,9 +49,10 @@ def highlight_routeros_code(raw_code: str) -> str:
 
 
 def _format_math_subscripts(expr: str) -> str:
-    """Converte subscritos matemáticos (ex: S_m, V_h, J_s, x_{max}) dentro de $...$ ou $$...$$."""
-    expr = re.sub(r"([A-Za-z0-9])_\{([^}]+)\}", r"\1<sub>\2</sub>", expr)
-    expr = re.sub(r"([A-Za-z0-9])_([a-zA-Z0-9]{1,3})(?![a-zA-Z0-9])", r"\1<sub>\2</sub>", expr)
+    """Converte subscritos e sobrescritos matemáticos (ex: S_m, V_h, ALQ_{inter}, x^{2}) dentro de expressões."""
+    expr = re.sub(r"([A-Za-z0-9\)\]])_\{([^}]+)\}", r"\1<sub>\2</sub>", expr)
+    expr = re.sub(r"([A-Za-z0-9\)\]])_([a-zA-Z0-9]{1,4})(?![a-zA-Z0-9])", r"\1<sub>\2</sub>", expr)
+    expr = re.sub(r"([A-Za-z0-9\)\]])\^\{([^}]+)\}", r"\1<sup>\2</sup>", expr)
     return expr
 
 
@@ -74,17 +75,26 @@ def normalize_inline_latex(text: str) -> str:
     em texto legível normal, preservando valores monetários como R$ 1.500
     e mantendo intacta toda a estrutura de parágrafos e títulos do Markdown.
     """
+    # Passo 0: Resolve wrappers de texto (\text{...}, \mathrm{...}) e subscritos com chaves (_{...})
+    # ANTES do \frac{...}{...} para que chaves internas não quebrem frações como \frac{1 - ALQ_{inter}}{1 - ALQ_{intra}}
+    for _ in range(2):
+        text = re.sub(r"\\(?:text|textbf|textit|mathrm|mathbf|mathit)\{([^}]*)\}", r"\1", text)
+
     latex_replacements = [
         # Ordinais femininos e masculinos ($2^\text{a}$, $1^\text{o}$, $7^\circ$)
-        (r"\^\{\\text\{a\}\}|\^\\text\{a\}|\^\{a\}", "ª"),
-        (r"\^\{\\text\{o\}\}|\^\\text\{o\}|\^\{o\}", "º"),
+        (r"\^\{\\text\{a\}\}|\^\\text\{a\}|\^\{a\}|\^a(?![a-zA-Z])", "ª"),
+        (r"\^\{\\text\{o\}\}|\^\\text\{o\}|\^\{o\}|\^o(?![a-zA-Z])", "º"),
         (r"\^\{\\circ\}|\^\\circ(?![a-zA-Z])", "º"),
         (r"\\circ(?![a-zA-Z])", "°"),
-        # Text wrappers primeiro para liberar chaves internas antes de \frac
-        (r"\\(?:text|textbf|textit|mathrm|mathbf|mathit)\{([^}]*)\}", r"\1"),
-        # Frações (\frac{a}{b}) e delimitadores (\left( \right))
+        # Subscritos e sobrescritos entre chaves (ex: MVA_{original}, ALQ_{inter}) antes do \frac
+        (r"([A-Za-z0-9\)\]])_\{([^}]+)\}", r"\1<sub>\2</sub>"),
+        (r"([A-Za-z0-9\)\]])\^\{([^}]+)\}", r"\1<sup>\2</sup>"),
+        # Frações (\frac{a}{b}) - executado 2x para suportar frações aninhadas
         (r"\\frac\{([^}]*)\}\{([^}]*)\}", _format_frac),
-        (r"\\(?:left|right)\s*([\(\)\[\]\{\}|])", r"\1"),
+        (r"\\frac\{([^}]*)\}\{([^}]*)\}", _format_frac),
+        # Delimitadores (\left(, \right), \left\{, \right\}, \left[, \right])
+        (r"\\(?:left|right)\s*\\?([\(\)\[\]\{\}|.])", lambda m: "" if m.group(1) == "." else m.group(1)),
+        (r"\\([\{\}])", r"\1"),
         # Letras gregas e símbolos comuns em engenharia e finanças
         (r"\\Delta(?![a-zA-Z])", "Δ"),
         (r"\\delta(?![a-zA-Z])", "δ"),
@@ -117,13 +127,14 @@ def normalize_inline_latex(text: str) -> str:
         (r"\\!", ""),
     ]
 
-    # Passo 1: Substitui todos os comandos LaTeX (\times, ^\circ, \text{...}, \frac, \Delta, etc.)
+    # Passo 1: Substitui todos os comandos LaTeX (\times, ^\circ, \frac, \left\{, \Delta, etc.)
     for pattern, repl in latex_replacements:
         text = re.sub(pattern, repl, text)
 
-    # Passo 2: Converte blocos de equação $$ ... $$ em destaque técnico legível
+    # Passo 2: Converte blocos de equação $$ ... $$ (mesmo se quebrados em múltiplas linhas) em destaque técnico legível
     def replace_display_math(match: re.Match) -> str:
-        inner = _format_math_subscripts(match.group(1).strip())
+        inner = re.sub(r"\s+", " ", match.group(1)).strip()
+        inner = _format_math_subscripts(inner)
         inner = re.sub(r"\^([aAoO])(?![a-zA-Z])", lambda m: "ª" if m.group(1).lower() == "a" else "º", inner)
         return (
             '<div class="my-3 p-3.5 rounded-xl bg-[#080D1A] border border-[#1C2742] '
@@ -131,7 +142,7 @@ def normalize_inline_latex(text: str) -> str:
             f"{inner}</div>"
         )
 
-    text = re.sub(r"\$\$([^\$\n]+?)\$\$", replace_display_math, text)
+    text = re.sub(r"\$\$([^\$]+?)\$\$", replace_display_math, text)
 
     # Passo 3: Remove cifrões de expressões inline $...$ (preservando R$ e US$) e formata subscritos
     def replace_inline_math(match: re.Match) -> str:
@@ -140,7 +151,7 @@ def normalize_inline_latex(text: str) -> str:
         return inner
 
     text = re.sub(
-        r"(?<![A-Za-z\\])\$(?!\s)([^\$\n]{1,80}?)(?<!\s)\$",
+        r"(?<![A-Za-z\\])\$(?!\s)([^\$\n]{1,160}?)(?<!\s)\$",
         replace_inline_math,
         text,
     )
